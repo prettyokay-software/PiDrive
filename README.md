@@ -1,16 +1,16 @@
-# tedivm's flask starter app
+# PiDrive
 
-![Screenshot](https://github.com/twintechlabs/flaskdash/blob/master/app/static/images/screenshot.png)
+# THIS CODE IS NOT PRODUCTION READY AT THIS TIME!
+Ever needed to have a bunch of different USB drives connected to a machine, but that machine is far away? Or do you want to automate backups to an external drive that can be stored anywhere? PiDrive is for you!
 
-This code base serves as starting point for writing your next Flask application.
+PiDrive uses the USB-Gadget abilities of the Pi Zero and Pi 4 (and potentially other SBCs) to emulate a sparse file backed USB drives that can be stored on the Pi, Network Storage, an physical HDD, or really anywhere you want! All manageable by a Flask web UI/API (based on This project uses tedivm's flask starter app). 
 
-This package is designed to allow developers to start working on their specific features immediately while also making it simple to deploy the project into production. It contains a number of configured extensions and libraries as well as unique features specifically built for this package. It also is completely dockerized, with both a docker-compose testenv and the ability to easily make images off of the application for pushing into production.
+Currently only the UI is finished, mounting/creating drives will come as soon as my test hardware arrives. 
 
 
 ## Code characteristics
 
 * Tested on Python 3.3, 3.4, 3.5, 3.6, and 3.7
-* Complete docker environment.
 * Images for both the web application and the celery worker.
 * Full user management system.
 * Server side session storage.
