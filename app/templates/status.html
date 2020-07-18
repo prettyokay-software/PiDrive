@@ -1,0 +1,84 @@
+{% extends "common/dark_base.html" %}  {# common/page_base.html extends layout.html #}
+{% block title %} - System Status{% endblock %}
+{% block content %}
+{% from "common/form_macros.html" import render_field %}
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-header text-center">
+        Drive Status
+      </div>
+      <div class="card-body row text-center">
+        <div class="col">
+          {% if mount_status == "Mounted" %}
+          <div class="text-value-x1 bg-success theme-color">{{ mount_status }}</div>
+          {% else %}
+          <div class="text-value-x1 bg-grey-600 theme-color">{{ mount_status }}</div>
+          {% endif %}
+          <div class="text-uppercase text-muted small">Status</div>
+        </div>
+        <div class="c-vr"></div>
+        <div class="col">
+          <div class="text-value-x1">{{ mounted_drive }}</div>
+          <div class="text-uppercase text-muted small">Current Drive</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card">
+      <div class="card-header text-center">
+        Hardware Status
+      </div>
+      <div class="card-body row text-center">
+        <div class="col">
+          <div class="text-value-x1">{{ cpu_temp }}<span>&#176;</span>C</div>
+          <div class="text-uppercase text-muted small">CPU Temperature</div>
+        </div>
+        <div class="c-vr"></div>
+        <div class="col">
+          <div class="text-value-x1">{{ load_5min }}</div>
+          <div class="text-uppercase text-muted small">Load Average (5 min)</div>
+        </div>
+        <div class="c-vr"></div>
+        <div class="col">
+          <div class="text-value-x1">{{ uptime }}</div>
+          <div class="text-uppercase text-muted small">Uptime</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-header text-center">
+        Latest Logs
+      </div>
+      <div class="card-body row text-center">
+          <table class="table table-hover table-striped" style="padding-top: 50px;">
+            <thead>
+              <tr>
+                <th>Drive</th>
+                <th>Action</th>
+                <th>User</th>
+                <th>Details</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in log_entries %}
+              <tr>
+                <td>{{ log.name }}</td>
+                <td>{{ log.DriveLog.action }}</td>
+                <td>{{ log.DriveLog.user }}</td>
+                <td>{{ log.DriveLog.data }}</td>
+                <td>{{ log.DriveLog.action_date }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+  </div>
+</div>
+{% endblock %}

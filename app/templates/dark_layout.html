@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        {% block title_tag %}
+        <title>{{ config['APP_NAME'] }}{% block title %}{% endblock %}</title>
+        {% endblock %}
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Place favicon.ico and apple-touch-icon(s) in the root directory -->
+        <link rel="shortcut icon" href="images/favicon.ico">
+
+        <!-- stylesheets -->
+        <!-- stylesheets and javascript -->
+        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.css" integrity="sha256-q5+FXlQok94jx7fkiX65EGbJ27/qobH6c6gmhngztLE=" crossorigin="anonymous" />
+
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" integrity="sha384-rgWRqC0OFPisxlUvl332tiM/qmaNxnlY46eksSZD84t+s2vZlqGeHrncwIRX7CGp" crossorigin="anonymous"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.js" integrity="sha256-nB5IzxtznpdsVh/iELG3YdRF71rcxuh4tItH2jWfg/w=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.4.0/css/perfect-scrollbar.css" integrity="sha256-e2UIyejgTejr/sXeLOHEMDvEagonkoPv9+JIwckAqRs=" crossorigin="anonymous" />
+
+        <link href="{{ url_for('static', filename='/coreui/css/style.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='/coreui/dist/css/coreui.css') }}" rel="stylesheet">
+        <script src="{{ url_for('static', filename='/coreui/dist/js/coreui.min.js') }}"></script>
+
+    </head>
+    <body>
+        {% block body %}
+        <div class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
+          <header class="app-header navbar">
+            <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('main.status_page') }}">
+              {{ config['APP_NAME'] }}
+            </a>
+            <a class="nav-link nav-link--rounded pull-right" style="margin-right: 10px;" href="{{ url_for('user.logout') }}">
+              Sign out
+            </a>
+          </header>
+          <div class="app-body">
+            <div class="sidebar">
+              <nav class="sidebar-nav">
+                <ul class="nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.status_page') }}">
+                      <i class="nav-icon icon-"></i> Home</a>
+                  <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                      <i class="nav-icon icon-bell"></i> My Account</a>
+                    <ul class="nav-dropdown-items">
+                      {% if not config.get('USER_LDAP', False) %}
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.user_profile_page') }}">
+                          <i class="nav-icon icon-drop"></i> Profile</a>
+                      </li>
+
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user.change_password') }}">
+                          <i class="nav-icon icon-drop"></i> Password</a>
+                      </li>
+                      {% endif %}
+
+	              {% if current_user.is_authenticated %}
+			{% if current_user.has_role('admin') or current_user.has_role('dev') %}
+		          <li class="nav-item">
+			    <a class="nav-link" href="{{ url_for('apikeys.apikeys_index') }}">
+			      <i class="nav-icon icon-drop"></i> API Keys</a>
+		          </li>
+			{% endif %}
+                      {% endif %}
+
+                    </ul>
+                  </li>
+
+	          {% if current_user.is_authenticated %}
+			  {% if current_user.has_role('admin') %}
+        </li>
+        <li class="nav-title">Drive Management</li>
+			  <li class="nav-item">
+			    <a class="nav-link" href="{{ url_for('drives.drives_index') }}">
+			      <i class="nav-icon fa fa-bars"></i> Manage USB Drives</a>
+        </li>
+        <li class="nav-title">Administration</li>
+			  <li class="nav-item">
+			    <a class="nav-link" href="{{ url_for('main.user_admin_page') }}">
+			      <i class="nav-icon fa fa-users"></i> Manage Users</a>
+			  {% endif %}
+                  {% endif %}
+
+                </ul>
+              </nav>
+            </div>
+
+          {% block pre_content %}{% endblock %}
+
+          <main class="main">
+          {# One-time system messages called Flash messages #}
+          {% block flash_messages %}
+              {%- with messages = get_flashed_messages(with_categories=true) -%}
+                  {% if messages %}
+                      {% for category, message in messages %}
+                          {% if category=='error' %}
+                              {% set category='danger' %}
+                          {% endif %}
+                          <div style="margin-bottom: -2px;" role="alert" class="alert alert-{{category}} alert-dismissible fade show">{{ message|safe }}</div>
+                      {% endfor %}
+                  {% endif %}
+              {%- endwith %}
+          {% endblock %}
+
+          <!-- Breadcrumb-->
+          <ol class="breadcrumb">
+            {% block breadcrumb %}
+            {% endblock %}
+          </ol>
+
+          <div class="container-fluid">
+            <div class="animated fadeIn">
+              <div class="ui-view">
+              {% block content %}{% endblock %}
+            </div>
+            </div>
+          </div>
+
+          </main>
+          {% block post_content %}{% endblock %}
+
+        {% endblock %}
+        </div>
+        <footer class="app-footer">
+          <div>{{ config['APP_NAME'] }} &copy; {{ now().year }} {{ config['APP_OWNER_NAME'] }}</div>
+        </footer>
+      </div>
+        <script>
+            // Hide loader
+            (function() {
+                $(".alert").fadeTo(4000, 500).slideUp(500, function(){
+                    $(".alert").slideUp(500);
+                });
+                {% block onstart_javascript %}{% endblock %}
+            })();
+            {% block page_load_javascript %}{% endblock %}
+        </script>
+    </body>
+</html>

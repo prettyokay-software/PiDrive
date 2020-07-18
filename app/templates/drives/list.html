@@ -1,0 +1,73 @@
+{% extends "common/dark_base.html" %}  {# common/page_base.html extends layout.html #}
+{% block breadcrumb %}
+<li class="breadcrumb-item active">
+  <a href="{{ url_for('drives.drives_index') }}">USB Drives</a>
+</li>
+{% endblock %}
+{% block content %}
+<div class="card ">
+    <div class="card-header ">
+      <strong>USB Drives</strong>
+      <a href="{{ url_for('drives.drives_create') }}" class="btn btn-pill btn-sm btn-primary pull-right">Create New USB Drive</a>
+    </div>
+    <div class="card-body ">
+      <table class="table table-hover table-striped" style="padding-top: 50px;">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Free Space</th>
+            <th>Size</th>
+            <th>Mounted</th>
+            <th>Test</th>
+            <th>Last Used</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for drive in all_drives %}
+          <tr>
+            <td>{{ drive.name }}</td>
+            <td>{{ drive.description }}</td>
+            <td>{{ drive.free_space }}</td>
+            <td>{{ drive.size }}GB</td>
+            <td>{{ drive.mounted }}</td>
+            <td>
+              {% if drive.mounted == True %}
+                <label class="switch switch-pill switch-success">
+                <input type="checkbox" class="switch-input" id="drive_{{ drive.id }}" value="{{ drive.id }}" onClick="MountDrive(this.value)" checked>
+              {% else %}
+                <label class="switch switch-pill switch-light">
+                <input type="checkbox" class="switch-input" id="drive_{{ drive.id }}" value="{{ drive.id }}" onClick="MountDrive(this.value)">
+              {% endif %}
+              <span class="switch-slider"></span>
+            </label>
+          </td>
+            <td>{{ drive.last_used }}</td>
+            <td>              
+              <div class="btn-group" role="group" aria-label="...">
+              <a href="{{ url_for('drives.drives_delete', drive_id=drive.id) }}"><i class="fa fa-remove"></i> Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer ">
+    </div>
+</div>
+<script>
+  // Send POST to trigger mount
+  function MountDrive(id) {
+    //alert("Clicked "+ id)
+    var url = "{{ url_for('drives.drives_index')}}"
+    $.ajax({
+    method:'PUT',
+    url:'/drives/mount/'+id,
+    //data:{drive_id: id},
+    success:function(){
+        window.location.href=url;
+    }
+});
+}       
+</script>
+{% endblock %}

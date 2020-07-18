@@ -1,0 +1,27 @@
+{% extends "common/dark_base.html" %}  {# common/page_base.html extends layout.html #}
+{% block title %}Create a new USB Drive{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active">
+  <a href="{{ url_for('drives.drives_index') }}">USB Drives</a>
+</li>
+{% endblock %}
+{% block content %}
+{% from "common/form_macros.html" import render_field %}
+<div class="card ">
+  <form action="" method="POST" class="form" role="form">
+    <div class="card-header ">
+      <strong>New Drive</strong>
+    </div>
+    <div class="card-body ">
+          {{ form.hidden_tag() }}
+          {{ render_field(form.name) }}
+          {{ render_field(form.description) }}
+          {{ render_field(form.path) }}
+          {{ render_field(form.size)  }}
+    </div>
+    <div class="card-footer ">
+      <button type="submit " class="btn btn-sm btn-primary "><i class="fa fa-dot-circle-o "></i> Submit</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

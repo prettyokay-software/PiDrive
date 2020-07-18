@@ -1,0 +1,38 @@
+{% extends "common/dark_base.html" %}  {# common/page_base.html extends layout.html #}
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{{ url_for('drives.drives_index') }}">USB Drives</a>
+</li>
+{% endblock %}
+{% block title %} - Your new USB Drive {% endblock %}
+{% block content %}
+<div class="card ">
+    <div class="card-header ">
+      <strong>Your new USB Drive</strong>
+    </div>
+    <div class="card-body ">
+      <table class="table table-hover table-striped" style="padding-top: 50px;">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Size</th>
+            <th>Mounted</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ name }}</td>
+            <td>{{ description }}</td>
+            <td>{{ size }}GB</td>
+            <td>{{ mounted }}</td>
+            <td>{{ date_created }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer ">
+    </div>
+</div>
+{% endblock %}

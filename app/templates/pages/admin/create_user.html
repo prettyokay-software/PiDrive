@@ -1,0 +1,35 @@
+{% extends "common/dark_base.html" %}  {# common/page_base.html extends layout.html #}
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{{ url_for('main.user_admin_page') }}">Manage Users</a>
+</li>
+<li class="breadcrumb-item active">
+  <a href="{{ url_for('main.create_user_page') }}">Create User</a>
+</li>
+{% endblock %}
+{% block content %}
+
+{% from "common/form_macros.html" import render_field, render_checkbox_field, render_multicheckbox_field %}
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card ">
+        <form action="" method="POST" class="form" role="form">
+          <div class="card-header ">
+            <strong>Create User</strong>
+          </div>
+          <div class="card-body ">
+                {{ form.hidden_tag() }}
+                {{ render_field(form.first_name) }}
+                {{ render_field(form.last_name) }}
+                {{ render_field(form.email) }}
+                {{ render_field(form.password) }}
+                {{ render_checkbox_field(form.active) }}
+                {{ render_multicheckbox_field(form.roles) }}
+          </div>
+          <div class="card-footer ">
+            <button type="submit " class="btn btn-sm btn-primary "><i class="fa fa-dot-circle-o "></i> Submit</button>
+          </div>
+        </form>
+      </div>
+</div>
+{% endblock %}
