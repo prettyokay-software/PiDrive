@@ -12,20 +12,20 @@ Use at your own risk. I'm not responsible for lost data, exploded hardware, or a
 ## Installation
 Tested on Rasbian Lite on a Pi Zero W with Python 3.7 (There's a bug in 3.8 that breaks the template currently)
 
-*sudo apt install python3 python3-pip python3-venv libparted-dev
-*sudo nano /boot/config.txt
-*add "modules-load=dwc2" and "dtoverlay=dwc2" at bottom
-*sudo nano /etc/modules
-*add "dwc2"
-*reboot!
+* sudo apt install python3 python3-pip python3-venv libparted-dev
+* sudo nano /boot/config.txt
+* add "modules-load=dwc2" and "dtoverlay=dwc2" at bottom
+* sudo nano /etc/modules
+* add "dwc2"
+* reboot!
 
-*(From App Dir)
-*python3 -m venv env
-*source env/bin/activate
-*pip install -r requirements.txt (Go get a beer or 2 while this runs)
-*Update settings.py with desired settings
-*make init_db
-*python manage.py run
+* (From App Dir)
+* python3 -m venv env
+* source env/bin/activate
+* pip install -r requirements.txt (Go get a beer or 2 while this runs)
+* Update settings.py with desired settings
+* make init_db
+* python manage.py run
 
 
 
