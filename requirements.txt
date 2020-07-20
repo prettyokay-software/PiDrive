@@ -12,10 +12,6 @@ Flask-BabelEx==0.9.4
 Flask-User==1.0.2.2
 Flask-WTF==0.14.3
 
-# Automated tests
-pytest==5.4.1
-pytest-cov==2.8.1
-
 # Libraries
 beaker==1.11.0
 boto3==1.12.39
@@ -26,8 +22,18 @@ ldap3==2.7
 psycopg2-binary==2.8.5
 pyyaml==5.3.1
 requests==2.23.0
+
+# Specifically added for PiDrive
 email_validator
-gpiozero
+#gpiozero
+psutil
+pathvalidate
+pyparted
+imagemounter
+kmodpy
 
 # Development tools
 # tox==3.5.2
+# Automated tests
+#pytest==5.4.1
+#pytest-cov==2.8.1

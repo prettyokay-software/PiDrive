@@ -1,14 +1,15 @@
 from flask import Blueprint, redirect, render_template, current_app
 from flask import request, url_for, flash, send_from_directory, jsonify, render_template_string
 from flask_user import current_user, login_required, roles_accepted
-
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify, abort
+
 from app import db
 from app.models import user_models as users
 from app.models import drive_models as drives
-from app.utils import forms
+from app.utils import forms, drive_utility
 from datetime import datetime
 
+import os
 import time
 import uuid
 
@@ -33,13 +34,26 @@ def drives_create():
         description = request.form.get('description', None)
         path = request.form.get('path', None)
         size = request.form.get('size', None)
-        new_drive = drives.Drive(name=name, description=description, path=path, size=size, mounted=False, date_created=datetime.now())
-        db.session.add(new_drive)
-        db.session.flush()
-        drive_log = drives.DriveLog(drive_id=new_drive.id, action="Create", data="Initial Drive Creation", user=current_user.username, action_date=new_drive.date_created)
-        db.session.add(drive_log)
-        db.session.commit()
-        return render_template("drives/newdrive.html", name=name, description=description, path=path, size=size, mounted=False, date_created=datetime.now())
+
+        # Data sanitizing time!
+        full_path = drive_utility.SanitizeDrivePath(path, name)
+
+        # Create the image
+        creation_result = drive_utility.CreateDriveImage(full_path, size)
+
+        if creation_result.success:
+            new_drive = drives.Drive(name=name, description=description, path=full_path, size=size, free_space=size, mounted=False, date_created=datetime.now())
+            db.session.add(new_drive)
+            db.session.flush()
+            drive_log = drives.DriveLog(drive_id=new_drive.id, action="Create", data="Created image {} - {}GB".format(full_path, size), user=current_user.username, action_date=new_drive.date_created)
+            db.session.add(drive_log)
+            db.session.commit()
+            return render_template("drives/newdrive.html", name=name, description=description, path=full_path, size=size, mounted=False, date_created=datetime.now())
+        else:
+            flash("Drive Creation Failed {}".format(creation_result.message),"error")
+            os.remove(full_path)
+            return render_template("drives/create.html", form=form)
+
     return render_template("drives/create.html", form=form)
 
 
@@ -52,6 +66,7 @@ def drives_delete(drive_id):
     if request.method == 'POST':
         remove_drive = drives.Drive.query.filter_by(id=drive_id).first()
         if remove_drive:
+            os.remove(remove_drive.path)
             db.session.delete(remove_drive)
             db.session.commit()
         return redirect(url_for('drives.drives_index'))
@@ -70,20 +85,26 @@ def drives_mount(drive_id=None):
         if current_mount:
             current_mount.mounted = False
             db.session.add(current_mount)
-            unmount_log = drives.DriveLog(drive_id = current_mount.id,action = "Unmount", data = "Drive is being unmounted",
+            drive_utility.RemoveUSBDrive((current_mount.path))
+            unmount_log = drives.DriveLog(drive_id = current_mount.id,action = "Unmount", data = "Drive has been unmounted",
                 action_date=datetime.now(), user = current_user.username)
             db.session.add(unmount_log)
             db.session.flush()
+            # If new and old mount id match, we're just unmounting the currently mounted drive
             if current_mount.id == new_mount.id:
                 db.session.commit()
                 return "Unmounted {} successfully".format(current_mount.name)
 
+        drive_utility.InsertUSBDrive(new_mount.path)
         new_mount.mounted = True
-        mount_log = drives.DriveLog(drive_id = new_mount.id,action = "Mount", data = "Drive is being mounted",
+        mount_log = drives.DriveLog(drive_id = new_mount.id,action = "Mount", data = "Drive has been mounted",
             action_date=datetime.now(), user = current_user.username)
 
         db.session.add(mount_log)
         db.session.add(new_mount)
         db.session.commit()
+
+        flash("{} is now connected".format(new_mount.name),"success")
+
         return "Mounted {} successfully".format(new_mount.name)
     return redirect(url_for('drives.drives_index'))

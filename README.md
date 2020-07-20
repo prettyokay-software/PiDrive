@@ -1,24 +1,41 @@
 # PiDrive
 
-# THIS CODE IS NOT PRODUCTION READY AT THIS TIME!
 Ever needed to have a bunch of different USB drives connected to a machine, but that machine is far away? Or do you want to automate backups to an external drive that can be stored anywhere? PiDrive is for you!
 
-PiDrive uses the USB-Gadget abilities of the Pi Zero and Pi 4 (and potentially other SBCs) to emulate a sparse file backed USB drives that can be stored on the Pi, Network Storage, an physical HDD, or really anywhere you want! All manageable by a Flask web UI/API (based on This project uses tedivm's flask starter app). 
+PiDrive uses the USB-Gadget abilities of the Pi Zero and Pi 4 (and potentially other SBCs) to emulate a sparse file backed USB drives that can be stored on the Pi, Network Storage, a physical HDD, or really anywhere you want! All manageable by a Flask web UI/API (based on tedivm's flask starter app). 
 
-Currently only the UI is finished, mounting/creating drives will come as soon as my test hardware arrives. 
+# THIS CODE IS IN ALPHA
+The mount/unmount and creation of USB drives is working, but has not been tested in production
+Use at your own risk. I'm not responsible for lost data, exploded hardware, or anything else. You have been warned!
 
 
-## Code characteristics
+## Installation
+Tested on Rasbian Lite on a Pi Zero W with Python 3.7 (There's a bug in 3.8 that breaks the template currently)
+
+sudo apt install python3 python3-pip python3-venv libparted-dev
+sudo nano /boot/config.txt
+add "modules-load=dwc2" and "dtoverlay=dwc2" at bottom
+sudo nano /etc/modules
+add "dwc2"
+reboot!
+
+(From App Dir)
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt (Go get a beer or 2 while this runs)
+Update settings.py with desired settings
+make init_db
+python manage.py run
+
+
+
+## Features
 
 * Tested on Python 3.3, 3.4, 3.5, 3.6, and 3.7
-* Images for both the web application and the celery worker.
 * Full user management system.
 * Server side session storage.
 * An API system with API tokens and route decorators.
-* Well organized directories with lots of comments.
-* Includes test framework (`py.test` and `tox`)
 * Includes database migration framework (`alembic`, using `Flask-Migrate`)
-* Sends error emails to admins for unhandled exceptions
 
 ## Configured Extensions and Libraries
 
@@ -47,36 +64,7 @@ In addition the front end uses the open source versions of:
 
 * Versatile Configuration System - this project can be configured with a combination of configuration files, AWS Secrets Manager configuration, and environmental variables. This allows base settings to be built into the deployment, secrets to be managed securely, and any configuration value to be overridden by environmental variables.
 
-* A `makefile` with a variety of options to make common tasks easier to accomplish.
-
 * A [Celery](http://www.celeryproject.org/) based asynchronous task management system. This is extremely useful for long running tasks- they can be triggered in the web interface and then run on a worker node and take as long as they need to complete.
-
-
-## Setting up a development environment
-
-First we recommend either cloning this repository with the "Use this template" button on Github.
-
-
-We assume that you have `make` and `docker`.
-
-    # Clone the code repository into ~/dev/my_app
-    mkdir -p ~/dev
-    cd ~/dev
-    git clone https://github.com/tedivm/tedivms-flask my_app
-    cd my_app
-
-    # For the first run, and only the first run, we need to create the first round of SQLAlchemy models.
-    make init_db
-
-    # Create the 'my_app' virtual environment and start docker containers
-    make testenv
-
-    # Restart docker app container
-    docker-compose restart app
-
-    # Start a shell in the container running the application
-    docker-compose exec app /bin/bash
-
 
 ## Configuration
 
@@ -88,9 +76,6 @@ To set default configuration values on the application level- such as the applic
 
 A configuration file can be set with the environmental variable `APPLICATION_SETTINGS`.
 
-### AWS Secrets Manager
-
-Configuration can be loaded from the AWS Secrets Manager by setting the environmental variables `AWS_SECRETS_MANAGER_CONFIG` and `AWS_SECRETS_REGION`.
 
 ### Environmental Variables
 
@@ -124,26 +109,6 @@ LDAP_EMAIL_ATTRIBUTE=mail
 
     # This creates a new migration. It should be run whenever you change your database models.
     make upgrade_models
-
-
-## Running the app
-
-    # Start the Flask development web server
-    make testenv
-
-
-Point your web browser to http://localhost/
-
-You can make use of the following users:
-- email `user@example.com` with password `Password1`.
-- email `dev@example.com` with password `Password1`.
-- email `admin@example.com` with password `Password1`.
-
-
-## Running the automated tests
-
-    # To run the test suite.
-    make run_tests
 
 
 

@@ -1,0 +1,8 @@
+Changes 7-18-20
+------
+Remove unnecessary files
+Clean up README
+Add install documentation
+Remove gpiozero in favor of psutil to allow use on non RPi hardware
+Add image creation and formatting
+Add mount/unmount capability
