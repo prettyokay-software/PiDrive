@@ -9,7 +9,10 @@ from app.models.user_models import UserProfileForm, User, UsersRoles, Role
 from app.models.drive_models import DriveForm, Drive, DriveLog
 from app.utils.forms import ConfirmationForm
 import uuid, json, os
-import datetime
+from datetime import datetime
+import psutil
+from psutil._common import bytes2human
+import collections
 
 # When using a Flask app factory we must use a blueprint to avoid needing 'app' for '@app.route'
 main_blueprint = Blueprint('main', __name__, template_folder='templates')
@@ -20,11 +23,30 @@ def status_page():
     if not current_user.is_authenticated:
         return redirect(url_for('user.login'))
 
-    drive_status = Drive.query.filter_by(mounted=True).one_or_none()
+    mount_status = Drive.query.filter_by(mounted=True).one_or_none()
     mounted_drive = "None"
-    if drive_status:
+    general_data = get_general_data()
+    log_entries = db.session.query(DriveLog,Drive.name).join(Drive).limit(100).all()
+    if mount_status:
         mounted_drive = drive_status.name
-    return render_template('status.html', drive_status=drive_status, mounted_drive=mounted_drive)
+    return render_template('status.html', mount_status=mount_status, mounted_drive=mounted_drive,
+     general_data=general_data, log_entries=log_entries)
+
+def get_general_data():
+    # General statistics for homepage
+    general_data = collections.namedtuple('Sensor',['cpu_temp','load','cpu_percent','uptime'])
+    
+    general_data.cpu_temp = psutil.sensors_temperatures()[1].current
+    # 5 minute load average
+    general_data.load = psutil.getloadavg()[1]
+    general_data.cpu_percent = psutil.cpu_percent()
+    general_data.uptime = datetime.now() - psutil.boot_time
+    general_data.uptime = general_data.uptime / datetime.timedelta(minutes=1)
+
+    return general_data
+
+def get_net_data():
+    net_data = collections.namedtuple('Net',['bytes_rx', 'bytes_tx'])
 
 # The Admin page is accessible to users with the 'admin' role
 @main_blueprint.route('/admin')

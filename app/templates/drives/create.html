@@ -7,6 +7,7 @@
 {% endblock %}
 {% block content %}
 {% from "common/form_macros.html" import render_field %}
+<link rel="stylesheet" href="/static/js/jstree/themes/default/style.min.css" />
 <div class="card ">
   <form action="" method="POST" class="form" role="form">
     <div class="card-header ">
@@ -16,12 +17,60 @@
           {{ form.hidden_tag() }}
           {{ render_field(form.name) }}
           {{ render_field(form.description) }}
-          {{ render_field(form.path) }}
           {{ render_field(form.size)  }}
+          {{ render_field(form.path) }}
+          <div id="jstree_div"></div>
     </div>
     <div class="card-footer ">
       <button type="submit " class="btn btn-sm btn-primary "><i class="fa fa-dot-circle-o "></i> Submit</button>
     </div>
   </form>
 </div>
+
+<script src="/static/js/jstree/jstree.js"></script>
+
+<script id="jstree" name="jstree">
+  /*Search and JS Folder Tree*/
+$('#jstree_div').jstree({
+  "plugins": ["search"],
+                "search": {
+                    "case_sensitive": false,
+                    "show_only_matches": true,
+                    'ajax':{
+                      'url': "{{ url_for('api.build_jstree_json') }}"
+                }
+              },
+    'core': {
+        'data': {
+            'url': "{{ url_for('api.build_jstree_json') }}"
+            , 'type': 'GET'
+            , 'dataType': 'JSON'
+            , 'data': function(node){
+              var full_path = $('#jstree_div').jstree().get_path(node, "/");
+              full_path = full_path.toString().replace("//","/");
+              return {"path": full_path};
+            }
+        }
+    }
+});
+/*  --- This sets the search box value if you directly use the tree instead --- */
+{ 
+  $("#jstree_div").on("select_node.jstree", function (evt, data) {
+      var path = $('#jstree_div').jstree().get_path(data.node,"/")
+
+      document.getElementById("path").value = path.replace("//", "/");
+  });
+}
+
+/* --- This makes the search box work --- 
+$(document).ready(function () {
+            $("#path").keyup(function () {
+                var searchString = $(this).val();
+                console.log(searchString)
+                $('#jstree_div').jstree(true).search(searchString);
+            });
+        });
+*/
+
+</script>
 {% endblock %}

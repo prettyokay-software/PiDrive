@@ -10,16 +10,16 @@
       </div>
       <div class="card-body row text-center">
         <div class="col">
-          {% if mount_status == "Mounted" %}
-          <div class="text-value-x1 bg-success theme-color">{{ mount_status }}</div>
+          {% if mount_status.mounted == True %}
+          <div class="text-value-x1 bg-success theme-color">{{ mount_status.mounted }}</div>
           {% else %}
-          <div class="text-value-x1 bg-grey-600 theme-color">{{ mount_status }}</div>
+          <div class="text-value-x1 bg-grey-600 theme-color">False</div>
           {% endif %}
-          <div class="text-uppercase text-muted small">Status</div>
+          <div class="text-uppercase text-muted small">Active</div>
         </div>
         <div class="c-vr"></div>
         <div class="col">
-          <div class="text-value-x1">{{ mounted_drive }}</div>
+          <div class="text-value-x1">{{ mounted_drive}}</div>
           <div class="text-uppercase text-muted small">Current Drive</div>
         </div>
       </div>
@@ -33,17 +33,22 @@
       </div>
       <div class="card-body row text-center">
         <div class="col">
-          <div class="text-value-x1">{{ cpu_temp }}<span>&#176;</span>C</div>
+          <div class="text-value-x1">{{ general_data.cpu_temp }}<span>&#176;</span>C</div>
           <div class="text-uppercase text-muted small">CPU Temperature</div>
         </div>
         <div class="c-vr"></div>
         <div class="col">
-          <div class="text-value-x1">{{ load_5min }}</div>
+          <div class="text-value-x1">{{ general_data.load }}</div>
           <div class="text-uppercase text-muted small">Load Average (5 min)</div>
         </div>
         <div class="c-vr"></div>
         <div class="col">
-          <div class="text-value-x1">{{ uptime }}</div>
+          <div class="text-value-x1">{{ general_data.cpu_percent }}<span>%</span></div>
+          <div class="text-uppercase text-muted small">CPU Utilization</div>
+        </div>
+        <div class="c-vr"></div>
+        <div class="col">
+          <div class="text-value-x1">{{ general_data.uptime }}</div>
           <div class="text-uppercase text-muted small">Uptime</div>
         </div>
       </div>

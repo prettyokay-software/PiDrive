@@ -53,8 +53,8 @@ class DriveLog(db.Model):
 
 # Define the USB Drive form
 class DriveForm(FlaskForm):
-    name = StringField('Drive Name', validators=[validators.DataRequired('Key Label is required')])
+    name = StringField('Drive Name', validators=[validators.DataRequired('Drive name is required')])
     description = StringField('Description')
-    path = StringField('Drive Image File Path', validators=[validators.DataRequired('A Path is required')])
-    size = IntegerField('Drive Size (GB)', validators=[validators.DataRequired('A Drive Size is required')])
+    path = StringField('Drive Image Storage Location', validators=[validators.DataRequired('A path is required')])
+    size = IntegerField('Drive Size (GB)', validators=[validators.DataRequired('A drive size is required')])
     save = SubmitField('Save')

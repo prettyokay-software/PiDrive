@@ -143,14 +143,18 @@ def create_app(extra_config_settings={}):
     from app.views.misc_views import main_blueprint
     app.register_blueprint(main_blueprint)
 
+    from app.utils.api import api_blueprint
+    app.register_blueprint(api_blueprint)
+    #csrf_protect.exempt(api_blueprint)
+
     from app.views.apikeys import apikeys_blueprint
     app.register_blueprint(apikeys_blueprint)
 
     from app.views.drives import drives_blueprint
     app.register_blueprint(drives_blueprint)
 
-    from app.views.apis import api_blueprint
-    app.register_blueprint(api_blueprint)
+    #from app.views.apis import api_blueprint
+    #app.register_blueprint(api_blueprint)
     #csrf_protect.exempt(api_blueprint)
 
 

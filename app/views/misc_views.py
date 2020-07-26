@@ -8,9 +8,12 @@ from app import db
 from app.models.user_models import UserProfileForm, User, UsersRoles, Role
 from app.models.drive_models import DriveForm, Drive, DriveLog
 from app.utils.forms import ConfirmationForm
-import gpiozero
+from psutil._common import bytes2human
+import collections
+from datetime import datetime
 import uuid, json, os
-import datetime
+import psutil
+
 
 # When using a Flask app factory we must use a blueprint to avoid needing 'app' for '@app.route'
 main_blueprint = Blueprint('main', __name__, template_folder='templates')
@@ -26,30 +29,58 @@ def status_page():
     if not current_user.is_authenticated:
         return redirect(url_for('user.login'))
 
-    mount_status = "Unknown"
+    mount_status = Drive.query.filter_by(mounted=True).one_or_none()
     mounted_drive = "None"
-    cpu_temp = "??"
-    load_5min = "??"
-    uptime = "??"
-
-    #log_entries = DriveLog.query.join(Drive).limit(100).all()
+    general_data = get_general_data()
     log_entries = db.session.query(DriveLog,Drive.name).join(Drive).limit(100).all()
-    drive_status = Drive.query.filter_by(mounted=True).one_or_none()     
-    #cpu_temp=gpiozero.CPUTemperature().temperature
-    #load_5min = gpiozero.LoadAverage().load_average     
-
-    #with open('/proc/uptime', 'r') as f:
-    #    uptime_seconds = float(f.readline().split()[0])
-    #    uptime = str(datetime.timedelta(seconds = uptime_seconds))
-
-    if drive_status:
-        mounted_drive = drive_status.name
-        mount_status = "Mounted"
-    else:
-        mount_status = "Unmounted"
-
+    if mount_status:
+        mounted_drive = mount_status.name
     return render_template('status.html', mount_status=mount_status, mounted_drive=mounted_drive,
-    cpu_temp=cpu_temp, load_5min=load_5min, uptime=uptime, log_entries=log_entries)
+     general_data=general_data, log_entries=log_entries)
+
+def get_general_data():
+    # General statistics for homepage
+    general_data = collections.namedtuple('Sensor',['cpu_temp','load','cpu_percent','uptime'])
+    
+    general_data.cpu_temp = round(psutil.sensors_temperatures().get("cpu_thermal")[0].current, 1)
+    # 5 minute load average
+    general_data.load = psutil.getloadavg()[1]
+    general_data.cpu_percent = psutil.cpu_percent()
+
+    uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
+    if uptime.days > 0:
+        if uptime.days > 1:
+            day_string = "Days"
+        else: 
+            day_string = "Day"
+        uptime_day = f'{uptime.days} {day_string} '
+    else:
+        uptime_day = ""
+    # Hours
+    if uptime.seconds//3600 != 0:
+        if uptime.seconds//3600 > 1:
+            hour_string = "Hours"
+        else: 
+            hour_string = "Hour"
+        uptime_hour = f'{uptime.seconds//3600} {hour_string} '
+    else:
+        uptime_hour = ""
+
+    # Minutes
+    if (uptime.seconds//60)%60 != 0:
+        if (uptime.seconds//60)%60 > 1:
+            minute_string = "Minutes"
+        else: 
+            minute_string = "Minute"
+        uptime_min = f'{(uptime.seconds//60)%60} {minute_string}'
+    else:
+        uptime_min = ""
+
+    general_data.uptime = f"{uptime_day}{uptime_hour}{uptime_min}"
+
+    return general_data
+
+
 
 # The Admin page is accessible to users with the 'admin' role
 @main_blueprint.route('/admin')
