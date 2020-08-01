@@ -8,6 +8,7 @@ from app.models import user_models as users
 from app.models import drive_models as drives
 from app.utils import forms, drive_utility
 from datetime import datetime
+from pathlib import Path
 
 import os
 import time
@@ -65,10 +66,13 @@ def drives_delete(drive_id):
 
     if request.method == 'POST':
         remove_drive = drives.Drive.query.filter_by(id=drive_id).first()
-        if remove_drive:
+
+        if Path(remove_drive.path).exists():
+            # If for some reason the file doesn't exist, just move on            
             os.remove(remove_drive.path)
-            db.session.delete(remove_drive)
-            db.session.commit()
+
+        db.session.delete(remove_drive)
+        db.session.commit()
         return redirect(url_for('drives.drives_index'))
 
     return render_template("drives/delete.html", form=form, drive_id=drive_id, name=name.name)
